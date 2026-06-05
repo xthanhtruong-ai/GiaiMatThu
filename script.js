@@ -28,7 +28,7 @@ const CipherEngine = {
                     return char;
                 }).join('');
 
-            }).join(' / '); // Nối các từ bằng " / "
+            }).join(' /  '); // Nối các từ bằng " / "
         },
         encrypt: (text, key) => CipherEngine["chu-the-chu"].process(text, key),
         decrypt: (text, key) => CipherEngine["chu-the-chu"].process(text, key)
@@ -51,7 +51,7 @@ const CipherEngine = {
                     }
                     return char;
                 }).join(', ');
-            }).join('/');
+            }).join('/ ');
         },
         decrypt: (text, key) => {
             const cleanKey = key.replace(/\s+/g, '').toUpperCase();
