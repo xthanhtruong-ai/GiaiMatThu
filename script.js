@@ -15,18 +15,24 @@ const CipherEngine = {
         },
         process: (text, key) => {
             const shift = CipherEngine["chu-the-chu"].getShift(key);
-            return text.toUpperCase().split('').map(char => {
-                const code = char.charCodeAt(0);
-                if (code >= 65 && code <= 90) {
-                    return String.fromCharCode(((code - 65 + shift) % 26) + 65);
-                }
-                return char;
-            }).join('');
+
+            // 1. Tách theo khoảng trắng
+            // 2. .filter(word => word.length > 0) -> Loại bỏ các từ rỗng (tránh dư dấu /)
+            return text.toUpperCase().split(' ').filter(word => word.length > 0).map(word => {
+
+                return word.split('').map(char => {
+                    const code = char.charCodeAt(0);
+                    if (code >= 65 && code <= 90) {
+                        return String.fromCharCode(((code - 65 + shift) % 26) + 65);
+                    }
+                    return char;
+                }).join('');
+
+            }).join(' / '); // Nối các từ bằng " / "
         },
         encrypt: (text, key) => CipherEngine["chu-the-chu"].process(text, key),
         decrypt: (text, key) => CipherEngine["chu-the-chu"].process(text, key)
     },
-
     // 2. CHỮ THẾ SỐ
     "chu-the-so": {
         encrypt: (text, key) => {
@@ -44,8 +50,8 @@ const CipherEngine = {
                         return num + 1;
                     }
                     return char;
-                }).join('-');
-            }).join(' ');
+                }).join(', ');
+            }).join('/');
         },
         decrypt: (text, key) => {
             const cleanKey = key.replace(/\s+/g, '').toUpperCase();
