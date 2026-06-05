@@ -231,3 +231,18 @@ textarea.form-control {
     white-space: pre-wrap;
     overflow-x: auto;
 }
+
+/* ==========================================================================
+   Ô HIỂN THỊ LOGO
+   ========================================================================== */
+.logo-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.logo-container img {
+    border-radius: 50%;
+    /* Nếu muốn ảnh logo hình tròn */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Tạo đổ bóng cho logo */
+}
