@@ -207,13 +207,21 @@ const CipherEngine = {
 
     // 5. LOẠI: MƯA RƠI (ĐIỀN XÉO) - TỐI ƯU KHOẢNG CÁCH XY
     "mua-roi": {
-        encrypt: (text) => {
+        encrypt: (text, key) => {
             let cleanText = text.toUpperCase().replace(/[^A-Z]/g, '');
             if (!cleanText) return "Vui lòng nhập văn bản!";
 
-            const { rows, cols } = CipherEngine._findBestMatrixSize(cleanText.length, false);
+            // Logic mới: Tách khóa để lấy kích thước (Ví dụ khóa là "5x5" hoặc "4x6")
+            let rows = 5, cols = 5; // Mặc định 5x5
+            const match = key.match(/(\d+)\s*x\s*(\d+)/i);
+            if (match) {
+                rows = parseInt(match[1]);
+                cols = parseInt(match[2]);
+            }
+
             let grid = Array(rows).fill(null).map(() => Array(cols).fill(''));
 
+            // Điền văn bản theo đường chéo (Mưa rơi)
             let charIdx = 0;
             for (let k = 0; k < rows + cols - 1; k++) {
                 for (let r = 0; r < rows; r++) {
@@ -222,7 +230,7 @@ const CipherEngine = {
                         if (charIdx < cleanText.length) {
                             grid[r][c] = cleanText[charIdx++];
                         } else {
-                            grid[r][c] = 'Z';
+                            grid[r][c] = 'Z'; // Điền Z nếu thiếu
                         }
                     }
                 }
@@ -231,14 +239,22 @@ const CipherEngine = {
             let cipherText = "";
             for (let r = 0; r < rows; r++) { cipherText += grid[r].join(''); }
 
-            let matrixView = CipherEngine._generatePlainMatrixView(grid, `Mưa Rơi: ${rows}x${cols}`);
+            let matrixView = CipherEngine._generatePlainMatrixView(grid, `Mưa Rơi (${rows}x${cols}):`);
             return `${matrixView}\n>> BẢN MÃ THU ĐƯỢC:\n${cipherText}`;
         },
-        decrypt: (text) => {
+
+        decrypt: (text, key) => {
             let cleanText = text.toUpperCase().replace(/[^A-Z]/g, '');
             if (!cleanText) return "Vui lòng nhập mật thư!";
 
-            const { rows, cols } = CipherEngine._findBestMatrixSize(cleanText.length, false);
+            // Lấy kích thước từ khóa giống như encrypt
+            let rows = 5, cols = 5;
+            const match = key.match(/(\d+)\s*x\s*(\d+)/i);
+            if (match) {
+                rows = parseInt(match[1]);
+                cols = parseInt(match[2]);
+            }
+
             let grid = []; let idx = 0;
             for (let r = 0; r < rows; r++) {
                 grid.push(cleanText.substr(idx, cols).split(''));
@@ -249,12 +265,12 @@ const CipherEngine = {
             for (let k = 0; k < rows + cols - 1; k++) {
                 for (let r = 0; r < rows; r++) {
                     let c = k - r;
-                    if (c >= 0 && c < cols) { plainText += grid[r][c]; }
+                    if (c >= 0 && c < cols && grid[r] && grid[r][c]) {
+                        plainText += grid[r][c];
+                    }
                 }
             }
-
-            let matrixView = CipherEngine._generatePlainMatrixView(grid, `Mưa Rơi Giải Mã: ${rows}x${cols}`);
-            return `${matrixView}\n>> BẠCH VĂN ĐÃ GIẢI ĐƯỢC:\n${plainText}`;
+            return `>> BẠCH VĂN:\n${plainText}`;
         }
     },
 
